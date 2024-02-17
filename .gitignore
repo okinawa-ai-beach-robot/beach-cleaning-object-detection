@@ -163,6 +163,12 @@ cython_debug/
 # Custom
 Notebooks/yolo*
 Notebooks/*/
-yolov5/
+yolov5/*/
+
 Datasets/*/
 Datasets/*.zip
+Models/*/
+
+# include simple examples
+!/Datasets/trash\_detection.minimal\_example.yolov5pytorch
+!/Models/beachbot\_yolov5s\_trash\_detection\_\_minimal\_example\_\_yolov5pytorch\_160

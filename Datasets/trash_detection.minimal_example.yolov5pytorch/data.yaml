@@ -1,0 +1,21 @@
+names:
+- charcoal
+- coral
+- feet
+- pinecone
+- rock
+- seaweed
+- seawood
+- shell
+- stick
+- trash
+nc: 10
+roboflow:
+  license: MIT
+  project: trash-detection-8zhhs
+  url: https://universe.roboflow.com/stinkballs/trash-detection-8zhhs/dataset/2
+  version: 2
+  workspace: stinkballs
+test: ../Datasets/trash_detection.minimal_example.yolov5pytorch//test/images
+train: ../Datasets/trash_detection.minimal_example.yolov5pytorch//train/images
+val: ../Datasets/trash_detection.minimal_example.yolov5pytorch//valid/images
