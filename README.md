@@ -14,7 +14,13 @@ pip install notebook *[or alternatively pip install jupyterlab]*
 conda install -c anaconda ipykernel
 python -m ipykernel install --user --name=beachbot
 ```
-after this you should be able to start the notebooks like this:
+Alternatively, jupyter notebook can be installed via conda:
+```
+conda install -c conda-forge notebook
+conda install -c conda-forge nb_conda_kernels
+```
+
+After this you should be able to start the notebooks like this:
 ```
 cd [github repositor folder]
 jupyter notebook
