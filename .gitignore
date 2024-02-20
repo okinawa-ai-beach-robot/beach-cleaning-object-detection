@@ -168,7 +168,12 @@ yolov5/*/
 Datasets/*/
 Datasets/*.zip
 Models/*/
+Models/*.zip
 
 # include simple examples
 !/Datasets/trash\_detection.minimal\_example.yolov5pytorch
 !/Models/beachbot\_yolov5s\_trash\_detection\_\_minimal\_example\_\_yolov5pytorch\_160
+!/Datasets/*.pdf
+
+Notebooks/*.png
+Notebooks/*.pdf
