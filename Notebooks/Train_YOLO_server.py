@@ -11,7 +11,8 @@ from subprocess import call
 
 # Define dataset:
 # Unzipped download from roboflow webpage:
-dataset_location = "../Datasets/beach-cleaning-object-detection.v1i.yolov5pytorch/"
+#dataset_location = "../Datasets/beach-cleaning-object-detection.v1i.yolov5pytorch/"
+dataset_location = "../Datasets/beach-cleaning-object-detection.v2i.yolov5pytorch/"
 # or; dataset_location = "../Datasets/beach-cleaning-object-detection.v1i.yolov5pytorch/"
 
 # Define model variant:
@@ -104,7 +105,6 @@ pprint(model_def)
 
 # ## Write model configuration file for yolo training:
 
-# In[ ]:
 
 
 # modify number of classes for training:
@@ -121,7 +121,6 @@ pprint(model_def)
 # ## Start training and collect models
 # * trained models are stored in folder: beach-cleaning-object-detection/Models/
 
-# In[ ]:
 
 
 
