@@ -123,7 +123,7 @@ def main():
         if k == 27:
             break
         frame2 = set_resolution(160, 96, frame)
-        prediction = apply_model("/home/jasonhu/Downloads/best.onnx", frame2)
+        prediction = apply_model("../Models/beachbot_yolov5s_beach-cleaning-object-detection__v1i__yolov5pytorch_1280/best.onnx", frame2)
         class_ids, confidences, boxes = wrap_detection(frame2, prediction[0][0])
         img2 = draw_box(class_ids, confidences, boxes, frame2, 0.2)
         cv.imshow('image',img2)
