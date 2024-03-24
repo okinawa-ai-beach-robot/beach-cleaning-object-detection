@@ -1,32 +1,7 @@
 import numpy as np
 import cv2 as cv
 import onnxruntime
-import threading
-
-
-class ThreadedCamera:
-    def __init__(self, resolution=(1280, 720), camera_id=0, fps=15):
-        self._stopped = False
-        self._cap = cv.VideoCapture(camera_id)
-        self._cap.set(cv.CAP_PROP_FRAME_WIDTH, resolution[0])
-        self._cap.set(cv.CAP_PROP_FRAME_HEIGHT, resolution[1])
-        # read the first frame
-        self._ret, self._frame = self._cap.read()
-        threading.Thread(target=self.run, args=(), daemon=True).start()
-
-    def get_size(self):
-        return (int(self._cap.get(cv.CAP_PROP_FRAME_WIDTH)), int(self._cap.get(cv.CAP_PROP_FRAME_HEIGHT)))
-
-    def run(self):
-        while not self._stopped:
-            self._ret, self._frame = self._cap.read()
-        self._cap.release()
-
-    def read(self):
-        return self._frame
-
-    def stop(self):
-        self._stopped = True
+import beachbot
 
 
 def wrap_detection(input_image, output_data):
@@ -47,10 +22,9 @@ def wrap_detection(input_image, output_data):
         if confidence >= 0.2:
 
             classes_scores = row[5:]
-            _, _, _, max_indx = cv.minMaxLoc(classes_scores)
-            class_id = max_indx[1]
+            class_id = np.argmax(classes_scores)
 
-            if (classes_scores[class_id] > .25):
+            if classes_scores[class_id] > 0.25:
                 confidences.append(confidence)
 
                 class_ids.append(class_id)
@@ -82,7 +56,7 @@ def apply_model(location, inputs):
     if session is None:
         raise ValueError("Failed to load the model")
     inputs = np.swapaxes(np.swapaxes(inputs, 0, -1), -2, -1)[None, :, :, :] / 255
-    inputs = inputs.astype(np.float32)
+    inputs = inputs.astype(np.float16)
     prediction = session.run(None, {"images": inputs})
     return prediction
 
@@ -97,16 +71,26 @@ def set_resolution(intended_x, intended_y, image):
     crop_w = image.shape[1] - intended_x
     crop_h = image.shape[0] - intended_y
     if crop_h > 0:
-        image = image[crop_h // 2:-crop_h // 2]
+        image = image[crop_h // 2 : -crop_h // 2]
     if crop_w > 0:
-        image = image[:, crop_w // 2:-crop_w // 2]
+        image = image[:, crop_w // 2 : -crop_w // 2]
     return image
 
 
 def draw_box(class_ids, confidences, boxes, image, config):
-    colors = [(255, 255, 0), (0, 255, 0), (0, 255, 255), (255, 0, 0), (255, 0, 0), (255, 0, 0), (255, 0, 0),
-              (255, 0, 0), (255, 0, 0), (255, 0, 0)]
-    for (classid, confidence, box) in zip(class_ids, confidences, boxes):
+    colors = [
+        (255, 255, 0),
+        (0, 255, 0),
+        (0, 255, 255),
+        (255, 0, 0),
+        (255, 0, 0),
+        (255, 0, 0),
+        (255, 0, 0),
+        (255, 0, 0),
+        (255, 0, 0),
+        (255, 0, 0),
+    ]
+    for classid, confidence, box in zip(class_ids, confidences, boxes):
         if confidence >= config:
             color = colors[int(classid) % len(colors)]
             cv.rectangle(image, box, color, 2)
@@ -115,21 +99,32 @@ def draw_box(class_ids, confidences, boxes, image, config):
 
 
 def main():
-    cam = ThreadedCamera(camera_id=0)
-    while (1):
-        frame0 = cam.read()
-        frame = cv.cvtColor(frame0, cv.COLOR_BGR2RGB)
-        k = cv.waitKey(10) & 0xFF
-        if k == 27:
-            break
-        frame2 = set_resolution(160, 96, frame)
-        prediction = apply_model("../Models/beachbot_yolov5s_beach-cleaning-object-detection__v1i__yolov5pytorch_1280/best.onnx", frame2)
+    cam = beachbot.sensors.JetsonGstCameraNative()
+
+    while True:
+        # capture the next image
+        img = cam.read()
+
+        if img is None:  # timeout
+            continue
+
+        frame = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        frame2 = set_resolution(1280, 800, frame)
+        prediction = apply_model(
+            "../Models/beachbot_yolov5s_beach-cleaning-object-detection__v1i__yolov5pytorch_1280/best.onnx",
+            frame2,
+        )
         class_ids, confidences, boxes = wrap_detection(frame2, prediction[0][0])
         img2 = draw_box(class_ids, confidences, boxes, frame2, 0.2)
-        cv.imshow('image',img2)
+        cv.imshow("image", img2)
+        key = cv.waitKey(1)  # Wait indefinitely for a key press
+        if key == 27:  # Check if ESC key is pressed
+            break
+
     cv.destroyAllWindows()
     cam.stop()
     return 0
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
