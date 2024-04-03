@@ -100,12 +100,14 @@ def draw_box(class_ids, confidences, boxes, image, config):
 
 
 def main():
-    #cam = beachbot.sensors.JetsonGstCameraNative()
+    # cam = beachbot.sensors.JetsonGstCameraNative()
     cam = beachbot.sensors.JetsonCsiCameraOpenCV()
     viewer = beachbot.utils.ImageViewerMatplotlib
-    detector = beachbot.ai.Yolo5Onnx("../Models/beachbot_yolov5s_beach-cleaning-object-detection__v2i__yolov5pytorch_1280/best.onnx")
-    #opencv only supports fp32 in installed version!
-    #detector = beachbot.ai.Yolo5OpenCV("../Models/beachbot_yolov5s_beach-cleaning-object-detection__v2i__yolov5pytorch_1280/best.onnx")
+    detector = beachbot.ai.Yolo5Onnx(
+        "../Models/beachbot_yolov5s_beach-cleaning-object-detection__v2i__yolov5pytorch_1280/best.onnx"
+    )
+    # opencv only supports fp32 in installed version!
+    # detector = beachbot.ai.Yolo5OpenCV("../Models/beachbot_yolov5s_beach-cleaning-object-detection__v2i__yolov5pytorch_1280/best.onnx")
     wnd = viewer("Annotated Image")
     print("Starting detection loop...")
     try:
@@ -129,8 +131,20 @@ def main():
             wnd.show(img2)
             t_show = time.time()
 
-            print("process time is:", t_show-t_start, "s")
-            print("(frame grab", t_capture-t_start, "s, reshaping", t_reshape-t_capture, "s, detect", t_detect-t_reshape, "s, draw", t_draw-t_detect, "s, show", t_show-t_draw,"s")
+            print("process time is:", t_show - t_start, "s")
+            print(
+                "(frame grab",
+                t_capture - t_start,
+                "s, reshaping",
+                t_reshape - t_capture,
+                "s, detect",
+                t_detect - t_reshape,
+                "s, draw",
+                t_draw - t_detect,
+                "s, show",
+                t_show - t_draw,
+                "s",
+            )
     except KeyboardInterrupt as ex:
         pass
     wnd.close()
