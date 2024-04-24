@@ -131,7 +131,7 @@ eval_img_widths = [1280, 640, 320, 160]
 num_epochs = 400
 
 for img_width in reversed(eval_img_widths):
-    targetfolder = "beachbot_" + yolo_modeltype + "_" + dataset_id + "_" + str(img_width)
+    targetfolder = "beachbot_" + yolo_modeltype + "_" + dataset_id + "_" + str(img_width) + "_finetune"
     targetpath = yolo_path + "runs/train/" + targetfolder + "_results/"
     resultspath = "../Models/" + targetfolder + "/"
     #check if solder exists -> skip computation!
@@ -139,7 +139,7 @@ for img_width in reversed(eval_img_widths):
         print("Skipping run", img_width, ":", targetfolder, " or", resultspath,  " (resultfolders) exist!")
     else:
         print("Start run", img_width)
-        params=("--img " + str(img_width) + " --batch 16 --epochs " + str(num_epochs) + " --data " + dataset_location + "/data.yaml --cfg " + yolo_path + "/models/beachbot_" + yolo_modeltype + ".yaml --weights " +  yolo_modeltype + ".pt --name " + targetfolder + "_results  --cache").split()
+        params=("--img " + str(img_width) + "--freeze 10 --batch 16 --epochs " + str(num_epochs) + " --data " + dataset_location + "/data.yaml --cfg " + yolo_path + "/models/beachbot_" + yolo_modeltype + ".yaml --weights " +  yolo_modeltype + ".pt --name " + targetfolder + "_results  --cache").split()
         call(["python", yolo_path+"train.py"] + params)
         
         # Training done
