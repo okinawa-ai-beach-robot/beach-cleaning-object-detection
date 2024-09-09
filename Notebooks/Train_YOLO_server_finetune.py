@@ -16,7 +16,10 @@ from subprocess import call
 # or; dataset_location = "../Datasets/beach-cleaning-object-detection.v1i.yolov5pytorch/"
 
 # v2 + data augmentation: approx 3x500 samples, 6 classes:
-dataset_location = "../Datasets/beach-cleaning-object-detection.v3-augmented_ver.2.yolov5pytorch/"
+#dataset_location = "../Datasets/beach-cleaning-object-detection.v3-augmented_ver.2.yolov5pytorch/"
+
+# Extended dataset with robot images and further images recorded, state September 9th 2024
+dataset_location = "../Datasets/beach-cleaning-object-detection.v8-yolotrain.yolov5pytorch/"
 
 # Define model variant:
 yolo_modeltype = "yolov5s"
@@ -128,7 +131,7 @@ pprint(model_def)
 
 
 eval_img_widths = [1280, 640, 320, 160]
-num_epochs = 400
+num_epochs = 800
 
 for img_width in reversed(eval_img_widths):
     targetfolder = "beachbot_" + yolo_modeltype + "_" + dataset_id + "_" + str(img_width) + "_finetune"
@@ -139,7 +142,7 @@ for img_width in reversed(eval_img_widths):
         print("Skipping run", img_width, ":", targetfolder, " or", resultspath,  " (resultfolders) exist!")
     else:
         print("Start run", img_width)
-        params=("--img " + str(img_width) + "--freeze 10 --batch 16 --epochs " + str(num_epochs) + " --data " + dataset_location + "/data.yaml --cfg " + yolo_path + "/models/beachbot_" + yolo_modeltype + ".yaml --weights " +  yolo_modeltype + ".pt --name " + targetfolder + "_results  --cache").split()
+        params=("--img " + str(img_width) + " --freeze 10 --batch 16 --epochs " + str(num_epochs) + " --data " + dataset_location + "/data.yaml --cfg " + yolo_path + "/models/beachbot_" + yolo_modeltype + ".yaml --weights " +  yolo_modeltype + ".pt --name " + targetfolder + "_results  --cache").split()
         call(["python", yolo_path+"train.py"] + params)
         
         # Training done
