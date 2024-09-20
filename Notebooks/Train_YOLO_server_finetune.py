@@ -134,7 +134,7 @@ eval_img_widths = [1280, 640, 320, 160]
 num_epochs = 800
 
 for img_width in reversed(eval_img_widths):
-    targetfolder = "beachbot_" + yolo_modeltype + "_" + dataset_id + "_" + str(img_width) + "_finetune"
+    targetfolder = "beachbot_" + yolo_modeltype + "_" + dataset_id + "_" + str(img_width)
     targetpath = yolo_path + "runs/train/" + targetfolder + "_results/"
     resultspath = "../Models/" + targetfolder + "/"
     #check if solder exists -> skip computation!
