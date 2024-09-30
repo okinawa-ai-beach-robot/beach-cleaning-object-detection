@@ -177,3 +177,7 @@ Models/*.zip
 
 Notebooks/*.png
 Notebooks/*.pdf
+
+scripts/runs/*
+*.cache
+Models/*
