@@ -181,3 +181,4 @@ Notebooks/*.pdf
 scripts/runs/*
 *.cache
 Models/*
+scripts/yolov5s.pt
