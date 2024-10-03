@@ -142,7 +142,7 @@ for img_width in reversed(eval_img_widths):
         print("Skipping run", img_width, ":", targetfolder, " or", resultspath,  " (resultfolders) exist!")
     else:
         print("Start run", img_width)
-        params=("--img " + str(img_width) + " --batch 16 --epochs " + str(num_epochs) + " --data " + dataset_location + "/data.yaml --cfg " + yolo_path + "/models/beachbot_" + yolo_modeltype + ".yaml --weights " +  yolo_modeltype + ".pt --name " + targetfolder + "_results  --cache").split()
+        params=("--img " + str(img_width) + " --freeze 10 --batch 16 --epochs " + str(num_epochs) + " --data " + dataset_location + "/data.yaml --cfg " + yolo_path + "/models/beachbot_" + yolo_modeltype + ".yaml --weights " +  yolo_modeltype + ".pt --name " + targetfolder + "_results  --cache").split()
         call(["python", yolo_path+"train.py"] + params)
         
         # Training done
