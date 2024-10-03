@@ -177,3 +177,8 @@ Models/*.zip
 
 Notebooks/*.png
 Notebooks/*.pdf
+
+scripts/runs/*
+Models/*
+scripts/yolov5s.pt
+
