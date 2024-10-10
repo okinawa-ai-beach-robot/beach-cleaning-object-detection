@@ -3,7 +3,7 @@ import keyring
 import os
 
 
-def get_dataset(ver=1):
+def get_dataset(ver=1, model_format="coco", location="./dataset", overwrite=False):
     """
     Downloads dataset from Roboflow
     """
@@ -32,6 +32,10 @@ def get_dataset(ver=1):
         "beach-cleaning-object-detection"
     )
     version = project.version(ver)
-    dataset = version.download("coco")
+    dataset = version.download(model_format, location, overwrite)
     breakpoint()
     print("Dataset downloaded at " + dataset.location)
+
+
+if __name__ == "__main__":
+    get_dataset()
