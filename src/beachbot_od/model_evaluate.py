@@ -1,19 +1,26 @@
 from globox import AnnotationSet, COCOEvaluator, BoxFormat
-import sys
 import torch
 from roboflow_get_dataset import get_dataset
 import os
 import argparse
 from pathlib import Path
+import shutil
 
 
 def model_evaluate(model_path, dataset_path):
+    # Check if model exists else download from huggingface
+    if os.path.exists(model_path):
+        print(f"Existing model found at {model_path} not re-downloading")
+    else:
+        # TODO
+        # get_model()
+        RuntimeError("Model not found")
+
     # Check if dataset exists else download from roboflow
     if os.path.exists(dataset_path):
         print(f"Existing dataset found at {dataset_path} not re-downloading")
     else:
         get_dataset()
-
     gt_label_path = dataset_path + "/test/_annotations.coco.json"
     if not os.path.exists(gt_label_path):
         raise ValueError(f"{gt_label_path} does not exist")
@@ -40,6 +47,11 @@ def model_evaluate(model_path, dataset_path):
     # Run inference on all images within dataset
     results = model(images)
     results.save(save_dir="./detection_images", exist_ok=True)
+
+    # Remove cached or previous predictions:
+    if os.path.exists("detections"):
+        print("Removing previous detections")
+        shutil.rmtree("detections")
 
     # Loop over each image in results and save detection annotations
     for i in range(len(results.pandas().xywh)):
