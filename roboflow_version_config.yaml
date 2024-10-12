@@ -1,0 +1,89 @@
+augmentation:
+  # bbblur:
+  #   pixels: 2.0
+  # bbbrightness:
+  #   brighten: true
+  #   darken: true
+  #   percent: 23
+  # bbcrop:
+  #   min: 12
+  #   max: 71
+  # bbexposure:
+  #   percent: 30
+  # bbflip:
+  #   horizontal: true
+  #   vertical: false
+  # bbnoise:
+  #   percent: 50
+  # bbninety:
+  #   clockwise: true
+  #   counter-clockwise: false
+  #   upside-down: false
+  # bbrotate:
+  #   degrees: 45
+  # bbshear:
+  #   horizontal: 45
+  #   vertical: 45
+  blur:
+    pixels: 2.0
+  brightness:
+    brighten: true
+    darken: true
+    percent: 23
+  # crop:
+  #   min: 12
+  #   max: 71
+  # cutout:
+  #   count: 26
+  #   percent: 71
+  # exposure:
+  #   percent: 30
+  # flip:
+  #   horizontal: true
+  #   vertical: false
+  # hue:
+  #   degrees: 180
+  image:
+    versions: 3
+  # mosaic: true
+  # ninety:
+  #   clockwise: true
+  #   counter-clockwise: false
+  #   upside-down: false
+  noise:
+    percent: 1
+  # rgrayscale:
+  #   percent: 50
+  rotate:
+    degrees: 15
+  # saturation:
+  #   percent: 50
+  shear:
+    horizontal: 15
+    vertical: 15
+
+preprocessing:
+  auto-orient: true
+  # contrast:
+  #   type: Contrast Stretching
+  # filter-null:
+  #   percent: 50
+  # filter-tags:
+  #   tag_name: true
+  #   other_tag: false
+  # grayscale: true
+  # isolate: true
+  # remap:
+  #   original_class_name: new_class_name
+  resize:
+    width: 1280
+    height: 800
+    format: "Fill (with center crop) in"
+  # static-crop:
+  #   x_min: 10
+  #   x_max: 90
+  #   y_min: 10
+  #   y_max: 90
+  # tile:
+  #   rows: 2
+  #   columns: 2
