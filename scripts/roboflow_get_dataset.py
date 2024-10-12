@@ -42,7 +42,6 @@ def get_dataset(ver=1, model_format="coco", location="./dataset", overwrite=Fals
         )
 
     dataset = version.download(model_format, location, overwrite)
-    breakpoint()
     print("Dataset downloaded at " + dataset.location)
 
 
