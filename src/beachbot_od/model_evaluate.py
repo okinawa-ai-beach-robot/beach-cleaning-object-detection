@@ -4,11 +4,6 @@ import torch
 
 
 def model_evaluate(model_path, gt_label_path):
-    # load ground truth dataset
-    # gt = AnnotationSet.from_yolo_v5(
-    #    folder=gt_label_path,
-    #    image_folder=gt_img_dir,
-    # )
     gt = AnnotationSet.from_coco(
         file_path=gt_label_path,
     )
@@ -33,7 +28,7 @@ def model_evaluate(model_path, gt_label_path):
         filename = results.files[i]
         # Remove .jpg extension
         filename = filename[:-4]
-        # drop name and reorder for globox expected order
+        # drop class column and reorder for globox expected order
         df = results.pandas().xywh[i][
             ["name", "xcenter", "ycenter", "width", "height", "confidence"]
         ]
@@ -42,6 +37,8 @@ def model_evaluate(model_path, gt_label_path):
         df.to_csv(output_file, sep=" ", index=False, header=False)
 
     # Not using from_yolo_v5 as it doesn't allow to override relative=False
+    # See https://github.com/laclouis5/globox/discussions/48
+    # and https://github.com/laclouis5/globox/issues/49
     predictions = AnnotationSet.from_txt(
         folder="./detections",
         image_folder="./dataset/test",
