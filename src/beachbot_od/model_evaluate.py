@@ -3,13 +3,16 @@ import sys
 import torch
 
 
-def model_evaluate(model_path, gt_label_dir, gt_img_dir):
+def model_evaluate(model_path, gt_label_path):
     # load ground truth dataset
-    gt = AnnotationSet.from_yolo_v5(
-        folder=gt_label_dir,
-        image_folder=gt_img_dir,
+    # gt = AnnotationSet.from_yolo_v5(
+    #    folder=gt_label_path,
+    #    image_folder=gt_img_dir,
+    # )
+    gt = AnnotationSet.from_coco(
+        file_path=gt_label_path,
     )
-    images = ["dataset/test/images/" + item for item in list(gt.image_ids)]
+    images = ["dataset/test/" + item for item in list(gt.image_ids)]
 
     # Load model
     model = torch.hub.load("ultralytics/yolov5", "custom", path=model_path)
@@ -32,7 +35,7 @@ def model_evaluate(model_path, gt_label_dir, gt_img_dir):
         filename = filename[:-4]
         # drop name and reorder for globox expected order
         df = results.pandas().xywh[i][
-            ["class", "xcenter", "ycenter", "width", "height", "confidence"]
+            ["name", "xcenter", "ycenter", "width", "height", "confidence"]
         ]
 
         output_file = f"detections/{filename}.txt"
@@ -41,7 +44,7 @@ def model_evaluate(model_path, gt_label_dir, gt_img_dir):
     # Not using from_yolo_v5 as it doesn't allow to override relative=False
     predictions = AnnotationSet.from_txt(
         folder="./detections",
-        image_folder="./dataset/test/images",
+        image_folder="./dataset/test",
         box_format=BoxFormat.XYWH,
         relative=False,
         separator=None,
@@ -49,10 +52,10 @@ def model_evaluate(model_path, gt_label_dir, gt_img_dir):
     )
     evaluator = COCOEvaluator(ground_truths=gt, predictions=predictions)
     evaluator.show_summary()
+    evaluator.save_csv("evaluation.csv")
 
 
 if __name__ == "__main__":
     model_path = sys.argv[1]
-    gt_label_dir = sys.argv[2]
-    gt_img_dir = sys.argv[3]
-    model_evaluate(model_path, gt_label_dir, gt_img_dir)
+    gt_label_path = sys.argv[2]
+    model_evaluate(model_path, gt_label_path)
