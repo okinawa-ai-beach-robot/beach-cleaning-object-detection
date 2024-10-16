@@ -13,7 +13,8 @@ def load_config(config_path):
     return config
 
 
-def generate_version(config_path="../roboflow_version_config.yaml"):
+def generate_version(config_path="../roboflow_version_config.yaml") -> int:
+    # Return version ID
     # Access API from huggingface secrets
     api_key = os.getenv("ROBOFLOW_KEY")
 
@@ -42,6 +43,7 @@ def generate_version(config_path="../roboflow_version_config.yaml"):
 
     version = project.generate_version(settings)
     print("Version ID:", version)
+    return version
 
 
 if __name__ == "__main__":

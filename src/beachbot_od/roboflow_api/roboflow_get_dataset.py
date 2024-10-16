@@ -3,7 +3,7 @@ import keyring
 import os
 
 
-def get_dataset(ver=1, model_format="coco", location="./dataset", overwrite=False):
+def get_dataset(ver=1: int, model_format="coco", location="./dataset", overwrite=False):
     """
     Downloads dataset from Roboflow
     """
