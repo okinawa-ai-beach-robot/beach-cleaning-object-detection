@@ -178,9 +178,12 @@ Models/*.zip
 Notebooks/*.png
 Notebooks/*.pdf
 
-scripts/runs/*
-Models/*
-scripts/yolov5s.pt
-
 # pyproject versioning
 _version.py
+
+# temp evaluation files
+dataset/
+detection_images/
+detections/
+evaluation.csv
+model.pt
