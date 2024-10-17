@@ -3,9 +3,10 @@ from huggingface_hub import ModelCard, ModelCardData
 import os
 import pandas as pd
 import numpy as np
+import argparse
 
 
-def load_config(config_filename="../config.json"):
+def load_config(config_filename):
     # Get the absolute path of the config file relative to this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(script_dir)
@@ -35,7 +36,7 @@ def generate_results_table(evaluation_csv="evaluation.csv", markdown_file="READM
         f.write(markdown_table)
 
 
-def create_model_card(config_path="config.json", **kwargs):
+def create_model_card(config_path, **kwargs):
     # Load defaults from config file
     defaults = load_config(config_path)
 
