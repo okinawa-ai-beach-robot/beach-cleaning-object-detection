@@ -9,6 +9,7 @@ def get_model(version: str, resolution: int) -> Path:
         repo_id=repo_path, filename="model.pt", revision=version
     )
     model_path = Path(model_path)
+    print(f"Model downloaded to {model_path}")
     return model_path
 
 
