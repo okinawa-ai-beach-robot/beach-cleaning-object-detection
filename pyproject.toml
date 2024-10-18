@@ -25,6 +25,7 @@ dependencies = [
     "keyring==25.4.1",
     "pandas==2.2.3",
     "ultralytics==8.3.13"
+    "platformdirs==4.3.6"
 ]
 
 [project.urls]
