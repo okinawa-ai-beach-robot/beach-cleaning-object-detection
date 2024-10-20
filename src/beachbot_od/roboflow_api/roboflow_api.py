@@ -3,6 +3,8 @@ import keyring
 import os
 import yaml
 
+from ..config import BEACHBOT_DATASETS
+
 
 def load_config(config_path):
     # Load the YAML configuration file
@@ -50,9 +52,7 @@ def generate_version(config_path="../roboflow_version_config.yaml") -> int:
     return version
 
 
-def get_dataset(
-    ver: int = 1, model_format="coco", location="./dataset", overwrite=False
-):
+def get_dataset(ver: int = 1, model_format="coco", location=None, overwrite=False):
     """
     Downloads dataset from Roboflow
     """
@@ -61,14 +61,20 @@ def get_dataset(
         "beach-cleaning-object-detection"
     )
     version = project.version(ver)
+
     # Show warning if not overwriting and location already exists so users know new data will not be used
-    if not overwrite and os.path.exists(location):
+    if location is None:
+        location = BEACHBOT_DATASETS + "/" + str(ver) + "/" + model_format
+        print(f"Dataset location not specified, using default location: {location}.")
+    if os.path.exists(location) and not overwrite:
         print(
-            """
-        WARNING: dataset directory already exists, not overwriting.
-        To overwrite, set overwrite=True
+            f"""
+        WARNING: dataset directory already exists at {location}.
+        Will not overwrite. To overwrite, set overwrite=True
         """
         )
+    else:
+        print("Dataset will be downloaded to " + location)
 
     dataset = version.download(model_format, location, overwrite)
-    print("Dataset downloaded at " + dataset.location)
+    print("Dataset located at " + dataset.location)
