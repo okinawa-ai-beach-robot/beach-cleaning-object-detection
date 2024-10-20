@@ -36,7 +36,7 @@ def connect() -> roboflow.Roboflow:
     return rf
 
 
-def generate_version(config_path="../roboflow_version_config.yaml") -> int:
+def generate_version(config_path) -> int:
     # Return version ID
     # See https://docs.roboflow.com/api-reference/versions/create-a-project-version for more information
 
