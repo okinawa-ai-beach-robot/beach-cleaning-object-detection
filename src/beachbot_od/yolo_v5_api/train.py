@@ -142,9 +142,6 @@ class Train:
                 " (resultfolders) exist!",
             )
         else:
-            # if yolo output folder exists, delete it, as yolo will add suffixes -1..-n to the results folder otherwise:
-            if os.path.isdir(targetpath):
-                shutil.rmtree(targetpath)
             print("Start run", self.img_width)
             yolov5.train.run(
                 img=self.img_width,
