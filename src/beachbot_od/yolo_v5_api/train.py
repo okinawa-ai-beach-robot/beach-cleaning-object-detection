@@ -13,6 +13,9 @@ import yolov5
 import yolov5.export
 import yolov5.train
 
+from beachbot_od.config import BEACHBOT_DATASETS
+from beachbot_od.roboflow_api import get_dataset
+
 
 def get_git_revision_hash() -> str:
     return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("ascii").strip()
@@ -29,7 +32,7 @@ def parse_args():
         nargs="?",
         help="path to dataset root directory",
         type=str,
-        default="../Datasets/trash_detection.minimal_example.yolov5pytorch/",
+        default=BEACHBOT_DATASETS + "/13/yolov5pytorch/",
     )
     parser.add_argument(
         "--yolo_modeltype",
@@ -79,6 +82,7 @@ def modeltrain():
     print(args)
 
     dataset_location = os.path.abspath(args.dataset_location)
+    get_dataset(model_format="yolov5pytorch", location=dataset_location)
 
     # Define model variant:
     # e.g. yolo_modeltype = "yolov5s"
