@@ -78,19 +78,6 @@ def modeltrain():
     args = parse_args()
     print(args)
 
-    # Define dataset folder:
-    #
-    # Unzipped download from roboflow webpage:
-    # dataset_location = "../Datasets/beach-cleaning-object-detection.v1i.yolov5pytosrch/"
-    # dataset_location = "../Datasets/beach-cleaning-object-detection.v2i.yolov5pytorch/"
-    # or; dataset_location = "../Datasets/beach-cleaning-object-detection.v1i.yolov5pytorch/"
-    #
-    # v2 + data augmentation: approx 3x500 samples, 6 classes:
-    # dataset_location = "../Datasets/beach-cleaning-object-detection.v3-augmented_ver.2.yolov5pytorch/"
-    #
-    # Extended dataset with robot images and further images recorded, state September 9th 2024
-    # e.g. `dataset_location = "../Datasets/beach-cleaning-object-detection.v8-yolotrain.yolov5pytorch/"
-    #       dataset_location = "../Datasets/trash_detection.minimal_example.yolov5pytorch/"
     dataset_location = os.path.abspath(args.dataset_location)
 
     # Define model variant:
