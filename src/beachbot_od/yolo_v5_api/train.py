@@ -2,18 +2,14 @@
 # coding: utf-8
 
 
-import sys, os
+import os
 from pprint import pprint
 import shutil
-from subprocess import call
 import argparse
-import sys
 import yaml
-import shutil
 import subprocess
 
 import yolov5
-from yolov5 import train, val, detect, export, utils
 import yolov5.export
 import yolov5.train
 
