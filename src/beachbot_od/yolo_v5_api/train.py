@@ -105,6 +105,9 @@ class Train:
         print("Modified model configuration is:")
         pprint(model_def)
 
+    def change_img_width(self, img_width: int):
+        self.img_width = img_width
+
     def get_git_revision_hash() -> str:
         return (
             subprocess.check_output(["git", "rev-parse", "HEAD"])
@@ -114,110 +117,108 @@ class Train:
 
     def train(self):
 
-        for img_width in reversed(self.eval_img_widths):
-            img_width = int(img_width)
-            targetfolder = (
-                "beachbot_"
+        targetfolder = (
+            "beachbot_"
+            + self.yolo_modeltype
+            + "_"
+            + self.dataset_id
+            + "_"
+            + str(self.img_width)
+        )
+        targetpath = "runs/train/" + targetfolder + "_results/"
+        resultspath = self.out_folder + "/" + targetfolder + "/"
+
+        # check if solder exists -> skip computation!
+        if (
+            os.path.isdir(targetpath) or os.path.isdir(resultspath)
+        ) and not args.force_retrain:
+            print(
+                "Skipping run",
+                self.img_width,
+                ":",
+                targetfolder,
+                " or",
+                resultspath,
+                " (resultfolders) exist!",
+            )
+        else:
+            # if yolo output folder exists, delete it, as yolo will add suffixes -1..-n to the results folder otherwise:
+            if os.path.isdir(targetpath):
+                shutil.rmtree(targetpath)
+            print("Start run", self.img_width)
+            yolov5.train.run(
+                img=self.img_width,
+                batch=16,
+                epochs=self.num_epochs,
+                data=self.dataset_location + "/data.yaml",
+                cfg=self.yolo_path
+                + "/models/beachbot_"
                 + self.yolo_modeltype
-                + "_"
-                + self.dataset_id
-                + "_"
-                + str(img_width)
-            )
-            targetpath = "runs/train/" + targetfolder + "_results/"
-            resultspath = self.out_folder + "/" + targetfolder + "/"
-            # check if solder exists -> skip computation!
-
-            if (
-                os.path.isdir(targetpath) or os.path.isdir(resultspath)
-            ) and not args.force_retrain:
-                print(
-                    "Skipping run",
-                    img_width,
-                    ":",
-                    targetfolder,
-                    " or",
-                    resultspath,
-                    " (resultfolders) exist!",
-                )
-            else:
-                # if yolo output folder exists, delete it, as yolo will add suffixes -1..-n to the results folder otherwise:
-                if os.path.isdir(targetpath):
-                    shutil.rmtree(targetpath)
-                print("Start run", img_width)
-                yolov5.train.run(
-                    img=img_width,
-                    batch=16,
-                    epochs=self.num_epochs,
-                    data=self.dataset_location + "/data.yaml",
-                    cfg=self.yolo_path
-                    + "/models/beachbot_"
-                    + self.yolo_modeltype
-                    + ".yaml",
-                    weights=self.yolo_modeltype + ".pt",
-                    name=targetfolder + "_results",
-                    cache=True,
-                    device=self.device,
-                )
-
-                # Training done
-                # Following files in targetfolder are important:
-                resultfiles = [
-                    "weights/best.pt",
-                    "results.csv",
-                    "opt.yaml",
-                ]  # optional: "weights/last.pt"
-
-                # Create results folder
-                try:
-                    os.makedirs(resultspath, exist_ok=True)
-                    print("Trained model will be saved at:", resultspath)
-                except OSError as error:
-                    print("Trained model will update files in:", resultspath)
-
-                # Save model config in result folder
-                with open(resultspath + "model.yaml", "w") as file:
-                    yaml.dump(self.model_def, file)
-
-                # Copy train result data:
-                for fname in resultfiles:
-                    shutil.copy(targetpath + fname, resultspath)
-
-            # Export best model in ONNX format
-            # export image dimension must be multiple of 32:
-            img_width_export = int((img_width // 32) * 32)
-            img_heigt = round((img_width * 800.0) / 1280.0)
-            img_heigt_export = int((img_heigt // 32) * 32)
-            # write file with export information
-            data = dict(
-                img_width=img_width,
-                img_width_export=img_width_export,
-                img_heigt=img_heigt,
-                img_heigt_export=img_heigt_export,
-                train_args=str(args),
-                train_version=self.get_git_revision_hash(),
-            )
-            with open(resultspath + "export_info.yaml", "w") as outfile:
-                yaml.dump(data, outfile, default_flow_style=False)
-
-            # - Export model to onnx
-            # - TODO Export to tensorRT
-            # - TODO Export to tensorflow.js
-            # https://github.com/NVIDIA/TensorRT/blob/main/quickstart/SemanticSegmentation/tutorial-runtime.ipynb
-            # if not os.path.isfile(resultspath + "best.onnx") or not os.path.isfile(resultspath + "best.engine") or not os.path.isdir(resultspath + "best_web_module/"):
-            print("Export run", img_width)
-            yolov5.export.run(
-                weights=resultspath + "best.pt",
-                img=(img_heigt_export, img_width_export),
-                data=self.dataset_location,
-                include=[
-                    "onnx",
-                ],
-                opset=12,
-                simplify=True,
+                + ".yaml",
+                weights=self.yolo_modeltype + ".pt",
+                name=targetfolder + "_results",
+                cache=True,
                 device=self.device,
-                half=args.half_precision,
             )
+
+            # Training done
+            # Following files in targetfolder are important:
+            resultfiles = [
+                "weights/best.pt",
+                "results.csv",
+                "opt.yaml",
+            ]  # optional: "weights/last.pt"
+
+            # Create results folder
+            try:
+                os.makedirs(resultspath, exist_ok=True)
+                print("Trained model will be saved at:", resultspath)
+            except OSError as error:
+                print("Trained model will update files in:", resultspath)
+
+            # Save model config in result folder
+            with open(resultspath + "model.yaml", "w") as file:
+                yaml.dump(self.model_def, file)
+
+            # Copy train result data:
+            for fname in resultfiles:
+                shutil.copy(targetpath + fname, resultspath)
+
+        # Export best model in ONNX format
+        # export image dimension must be multiple of 32:
+        img_width_export = int((self.img_width // 32) * 32)
+        img_heigt = round((self.img_width * 800.0) / 1280.0)
+        img_heigt_export = int((img_heigt // 32) * 32)
+        # write file with export information
+        data = dict(
+            img_width=self.img_width,
+            img_width_export=img_width_export,
+            img_heigt=img_heigt,
+            img_heigt_export=img_heigt_export,
+            train_args=str(args),
+            train_version=self.get_git_revision_hash(),
+        )
+        with open(resultspath + "export_info.yaml", "w") as outfile:
+            yaml.dump(data, outfile, default_flow_style=False)
+
+        # - Export model to onnx
+        # - TODO Export to tensorRT
+        # - TODO Export to tensorflow.js
+        # https://github.com/NVIDIA/TensorRT/blob/main/quickstart/SemanticSegmentation/tutorial-runtime.ipynb
+        # if not os.path.isfile(resultspath + "best.onnx") or not os.path.isfile(resultspath + "best.engine") or not os.path.isdir(resultspath + "best_web_module/"):
+        print("Export run", self.img_width)
+        yolov5.export.run(
+            weights=resultspath + "best.pt",
+            img=(img_heigt_export, img_width_export),
+            data=self.dataset_location,
+            include=[
+                "onnx",
+            ],
+            opset=12,
+            simplify=True,
+            device=self.device,
+            half=args.half_precision,
+        )
 
 
 def parse_args():
