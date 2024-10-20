@@ -18,14 +18,6 @@ def get_git_revision_hash() -> str:
     return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("ascii").strip()
 
 
-def get_git_revision_short_hash() -> str:
-    return (
-        subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
-        .decode("ascii")
-        .strip()
-    )
-
-
 # Define path to yolo github repository that is equal to the pip base folder:
 yolo_path = os.path.dirname(yolov5.__file__)
 
