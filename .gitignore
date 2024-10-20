@@ -184,3 +184,4 @@ scripts/yolov5s.pt
 
 # pyproject versioning
 _version.py
+*.swp
