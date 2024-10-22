@@ -67,7 +67,7 @@ def get_dataset(
 
     # Show warning if not overwriting and location already exists so users know new data will not be used
     if location is None:
-        location = BEACHBOT_DATASETS + "/" + str(ver) + "/" + model_format
+        location = BEACHBOT_DATASETS + "/" + str(ver) + "/" + dataset_format
         print(f"Dataset location not specified, using default location: {location}.")
     if os.path.exists(location) and not overwrite:
         print(
@@ -79,6 +79,6 @@ def get_dataset(
     else:
         print("Dataset will be downloaded to " + location)
 
-    dataset = version.download(model_format, location, overwrite)
+    dataset = version.download(dataset_format, location, overwrite)
     print("Dataset located at " + dataset.location)
     return dataset
