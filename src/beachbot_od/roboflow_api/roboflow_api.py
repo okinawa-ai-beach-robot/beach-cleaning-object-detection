@@ -72,8 +72,8 @@ def get_dataset(
     if os.path.exists(location) and not overwrite:
         print(
             f"""
-        WARNING: dataset directory already exists at {location}.
-        Will not overwrite. To overwrite, set overwrite=True
+WARNING: dataset directory already exists at {location}.
+Will not overwrite. To overwrite, set overwrite=True
         """
         )
     else:
