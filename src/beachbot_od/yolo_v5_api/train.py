@@ -12,7 +12,7 @@ def run(
     dataset_version: int = 13,
     dataset_format: str = "yolov5pytorch",
     epochs: int = 1,
-    overwrite: bool = True,
+    overwrite: bool = False,
 ):
     """
     Train model
