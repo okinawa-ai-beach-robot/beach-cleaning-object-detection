@@ -1,4 +1,5 @@
 import roboflow
+from roboflow.core.dataset import Dataset
 import keyring
 import os
 import yaml
@@ -52,7 +53,9 @@ def generate_version(config_path) -> int:
     return version
 
 
-def get_dataset(ver: int = 1, model_format="coco", location=None, overwrite=False):
+def get_dataset(
+    ver: int = 1, dataset_format="coco", location=None, overwrite=False
+) -> Dataset:
     """
     Downloads dataset from Roboflow
     """
@@ -78,3 +81,4 @@ def get_dataset(ver: int = 1, model_format="coco", location=None, overwrite=Fals
 
     dataset = version.download(model_format, location, overwrite)
     print("Dataset located at " + dataset.location)
+    return dataset
