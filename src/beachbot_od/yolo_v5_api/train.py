@@ -1,73 +1,83 @@
-from beachbot_od.roboflow_api import get_dataset
-from beachbot_od.utils.models import get_model_path, get_base_model_weights_path
-from roboflow.core.dataset import Dataset
+from beachbot_od.utils.models import (
+    get_model_path,
+    model_exists,
+)
 from yolov5 import train
 import shutil
 from pathlib import Path
+import keyring
 
 
 def run(
     model_format: str = "yolov5s",
     img_width: int = 160,
     dataset_version: int = 13,
-    dataset_format: str = "yolov5pytorch",
     epochs: int = 1,
     overwrite: bool = False,
 ):
     """
-    Train model
+    Train model using yolov5-pip's train.run
+    Saves models to standardized BEACHBOT_MODELS directory
+    and removes previous train outputs if overwrite=True
+
+    Pulls datasets from roboflow if not available locally
+    Stores them in the pip installation for yolov5-pip
+    e.g. yolov5-pip/yolov5/beach-cleaning-object-detection-13
 
     Args:
         model_format: str
         imgsz: int
         dataset_version: int
-        dataset_format: str
         epochs: int
         overwrite: bool
     Returns:
 
     """
 
-    ###
-    # Just a tmp directory to use for the rigid save_dir definition in
-    # yolov5.train.run
-    # The only reason I overwrite the default is to be able to remove
-    # it prior to running train
-    ###
+    # Just a tmp dir to use for the rigid save_dir definition in train.run
     runs_dir: str = "beachbot_train_runs"
 
-    # Get Base Model
-    base_model_weights_path = get_base_model_weights_path(
-        model_format=model_format,
-        overwrite=overwrite,
-    )
-
-    # Get Model (leave here before training as it will throw an error on unintentional overwriting)
+    # Get standard model path from BEACHBOT_MODELS
     model_path = get_model_path(
         model_format=model_format,
         dataset_version=dataset_version,
-        imgsz=img_width,
-        overwrite=overwrite,
+        img_width=img_width,
     )
 
-    # Load dataset
-    dataset: Dataset = get_dataset(ver=dataset_version, dataset_format=dataset_format)
-    dataset_yaml = dataset.location + "/data.yaml"
+    # Checks if model already exists (first locally then on huggingface)
+    if model_exists(model_path) and not overwrite:
+        raise Exception(
+            f"""
+        Model {model_path} already exists. Aborting.
+        Add overwrite=True arg to overwrite."
+        """
+        )
 
-    # Remove previous train outputs
+    # Remove previous train outputs from runs_dir if overwrite=True
+    # else intentionally fail to prevent indexing and losing track
+    # of which training pertains to which in the standard yolov5
+    # output scheme.
     if Path(runs_dir).exists():
-        shutil.rmtree(Path(runs_dir))
+        if overwrite:
+            shutil.rmtree(Path(runs_dir))
+        else:
+            raise Exception(
+                f"""The directory '{runs_dir}' already exists.
+            Aborting to avoid overwriting.
+            Add overwrite=True arg to overwrite.
+            """
+            )
 
-    # Tested and this uses pretrained weights, see details on where these are from here:
+    # Tested and this uses pretrained weights for yolov5s,
+    # see details on where these are from here:
     # https://github.com/fcakyon/yolov5-pip/blob/7663793e49a9392dfe951c9ca8f631b01d7793ae/yolov5/utils/downloads.py#L84
     opt = train.run(
-        weights=base_model_weights_path,
         imgsz=img_width,
-        data=dataset_yaml,
+        data=f"https://universe.roboflow.com/okinawaaibeachrobot/beach-cleaning-object-detection/dataset/{dataset_version}",
+        roboflow_token=keyring.get_password("roboflow", "api_key"),
         epochs=epochs,
         exist_ok=True,
         project=runs_dir,
-        rect=True,
     )
 
     # Move results to BEACHBOT_MODELS
