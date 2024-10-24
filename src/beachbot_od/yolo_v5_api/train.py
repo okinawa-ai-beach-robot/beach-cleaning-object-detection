@@ -1,6 +1,7 @@
 from beachbot_od.utils.models import (
     get_model_path,
     model_exists,
+    get_base_model_weights_path,
 )
 from yolov5 import train
 import shutil
@@ -37,6 +38,12 @@ def run(
     # Just a tmp dir to use for the rigid save_dir definition in train.run
     runs_dir: str = "beachbot_train_runs"
 
+    # Get Base Model
+    base_model_weights_path = get_base_model_weights_path(
+        model_format=model_format,
+        overwrite=overwrite,
+    )
+
     # Get standard model path from BEACHBOT_MODELS
     model_path = get_model_path(
         model_format=model_format,
@@ -68,10 +75,15 @@ def run(
             """
             )
 
-    # Tested and this uses pretrained weights for yolov5s,
-    # see details on where these are from here:
+    # Tested and this uses pretrained weights for yolov5s even without,
+    # specifying weights. See details on where these are from here:
     # https://github.com/fcakyon/yolov5-pip/blob/7663793e49a9392dfe951c9ca8f631b01d7793ae/yolov5/utils/downloads.py#L84
+    # Though I chose to use a copy of the base model within the BEACHBOT_MODELS
+    # directory as otherwise a local copy is downloaded to the current working
+    # directory which is not ideal in many situations.
+
     opt = train.run(
+        weights=base_model_weights_path,
         imgsz=img_width,
         data=f"https://universe.roboflow.com/okinawaaibeachrobot/beach-cleaning-object-detection/dataset/{dataset_version}",
         roboflow_token=keyring.get_password("roboflow", "api_key"),
